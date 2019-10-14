@@ -9,7 +9,7 @@ public:
 
     cv::Mat doImage(cv::Mat img){
         cv::Mat dst;
-        blur(img, dst, cv::Size(_ksize, _ksize));
+        cv::blur(img, dst, cv::Size(_ksize, _ksize));
         return dst;
     }
 };

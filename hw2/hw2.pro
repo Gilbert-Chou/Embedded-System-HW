@@ -24,7 +24,14 @@ HEADERS  += mainwindow.h \
     median_blur.h \
     gaussian_blur.h \
     bilateral_blur.h \
-    threshold.h
+    threshold.h \
+    dilate.h \
+    erode.h \
+    morph_open.h \
+    morph_close.h \
+    morph_gradient.h \
+    morph_tophat.h \
+    morph_blackhat.h
 
 FORMS    += mainwindow.ui
 

@@ -8,7 +8,7 @@ public:
     Blur():_ksize(5){}
     Blur(int ksize):_ksize(ksize){}
 
-    void set_ksize(int ksize){
+    void setKsize(int ksize){
         _ksize = ksize;
     }
 

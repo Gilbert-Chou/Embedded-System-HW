@@ -9,7 +9,7 @@ public:
 
     cv::Mat doImage(cv::Mat img){
         cv::Mat dst;
-        medianBlur(img, dst, _ksize);
+        cv::medianBlur(img, dst, _ksize);
         return dst;
     }
 };

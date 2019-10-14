@@ -6,6 +6,8 @@
 #include <QImage>
 #include <QPixmap>
 #include "image_process.h"
+#include "dilate.h"
+#include "morph_blackhat.h"
 #include "threshold.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -15,10 +17,15 @@ MainWindow::MainWindow(QWidget *parent) :
     cv::Mat img = cv::imread("../img/board.jpg", CV_8UC1);
     cv::imshow("Ori", img);
     _ip = new Threshold(true);
-    cv::imshow("Test", _ip->doImage(img));
-    ((Threshold*)_ip)->setOtsu(false);
-    ((Threshold*)_ip)-> setVal(180);
-    cv::imshow("Test2", _ip->doImage(img));
+    img = _ip->doImage(img);
+    cv::imshow("Test", img);
+    delete _ip;
+    _ip = new Dilate(3);
+    img = _ip->doImage(img);
+    cv::imshow("Test2", img);
+    delete _ip;
+    _ip = new MorphBlackhat();
+    cv::imshow("Test3", _ip->doImage(img));
     ui->setupUi(this);
 
 }
