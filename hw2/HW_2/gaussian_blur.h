@@ -5,6 +5,7 @@
 
 class GaussianBlur : public Blur{
 public:
+    GaussianBlur():Blur(){}
     GaussianBlur(int ksize):Blur(ksize){}
 
     cv::Mat doImage(cv::Mat img){

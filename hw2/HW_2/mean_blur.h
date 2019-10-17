@@ -5,6 +5,7 @@
 
 class MeanBlur : public Blur{
 public:
+    MeanBlur():Blur(){}
     MeanBlur(int ksize):Blur(ksize){}
 
     cv::Mat doImage(cv::Mat img){

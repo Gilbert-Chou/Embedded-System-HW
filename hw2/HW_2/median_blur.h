@@ -5,6 +5,7 @@
 
 class MedianBlur : public Blur{
 public:
+    MedianBlur():Blur(){}
     MedianBlur(int ksize):Blur(ksize){}
 
     cv::Mat doImage(cv::Mat img){
