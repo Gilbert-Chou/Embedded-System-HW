@@ -10,29 +10,27 @@ public:
         cv::Mat dst;
 
         if(img.channels() == 3){
-//            std::vector<cv::Mat> channels;
-//            cv::split(img, channels);
+            std::vector<cv::Mat> channels;
+            cv::split(img, channels);
 
-//            cv::Mat B,G,R;
+            cv::Mat B,G,R;
 
-//            cv::equalizeHist( channels[0], B );
-//            cv::equalizeHist( channels[1], G );
-//            cv::equalizeHist( channels[2], R );
+            cv::equalizeHist( channels[0], B );
+            cv::equalizeHist( channels[1], G );
+            cv::equalizeHist( channels[2], R );
 
-//            std::vector<cv::Mat> combined;
-//            combined.push_back(B);
-//            combined.push_back(G);
-//            combined.push_back(R);
+            std::vector<cv::Mat> combined;
+            combined.push_back(B);
+            combined.push_back(G);
+            combined.push_back(R);
 
-//            cv::merge(combined, dst);
+            cv::merge(combined, dst);
 
-            cv::cvtColor(img, dst, CV_BGR2GRAY);
-            cv::equalizeHist(dst, dst);
+            cv::cvtColor(dst, dst, CV_BGR2GRAY);
         }
         else if(img.channels() == 1)
         {
-            cv::cvtColor(img, dst, CV_BGR2GRAY);
-            cv::equalizeHist(dst, dst);
+            cv::equalizeHist(img, dst);
         }
         else return img;
 

@@ -22,8 +22,9 @@
 #include "morph_gradient.h"
 #include "morph_tophat.h"
 #include "morph_blackhat.h"
-
 #include <time.h>
+#include <iostream>
+using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
 
@@ -31,29 +32,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-//    _original_image = cv::imread("/home/ubuntu/Embedded-System-HW/hw2/Images/board.jpg");
-//    QImage myShowImage;
-//    myShowImage = convertProcess(_original_image);
-//    ui->uiImg1->setPixmap(QPixmap::fromImage(myShowImage).scaled(this->ui->uiImg1->size()));
-//    cv::Mat img_gray;
-//    img_gray = _ip->doImage(img1);
-//    QImage Img2 = convertProcess(img_gray);
-//    ui->uiImg2->setPixmap(QPixmap::fromImage(Img2).scaled(this->ui->uiImg2->size()));
-
-//    cv::imshow("Ori", img);
-//    _ip = new Threshold(true);
-//    img = _ip->doImage(img);
-//    cv::imshow("Test", img);
-//    delete _ip;
-//    _ip = new Dilate(3);
-//    img = _ip->doImage(img);
-//    cv::imshow("Test2", img);
-//    delete _ip;
-//    _ip = new MorphBlackhat();
-//    cv::imshow("Test3", _ip->doImage(img));
-
-
 }
 
 
@@ -314,7 +292,7 @@ void MainWindow::on_dilate_button_clicked()
     if (!_threshold_image.empty())
     {
         start=(double)clock();
-        _ip = new Dilate(3);
+        _ip = new Dilate(1);
         _morphology_image = _ip->doImage(_threshold_image);
         QImage myShowImage;
         myShowImage = convertProcess(_morphology_image);
