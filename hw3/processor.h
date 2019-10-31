@@ -24,11 +24,11 @@ public:
         //物件計數索引
         int comp_idx = 0;
         //物件弧度變數
-        float ratio[255];
+        //float ratio[255];
         //物件弧度臨界值
-        float ratio_thr1 = 1.0;
-        float ratio_thr2 = 0.79;
-        float ratio_thr3 = 0.6;
+        float ratio_cir_thr1 = 1.0, ratio_cir_thr2 = 0.8;
+        float ratio_rec_thr1 = 0.8, ratio_rec_thr2 = 0.75;
+        float ratio_tri_thr = 0.6;
 
         //進行臨界值處理, 將影像二值化
         cv::threshold(src, temp, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
@@ -58,20 +58,20 @@ public:
             float tempR = 4 * CV_PI * contourArea(contours[i]) / (parameter * parameter);
 
             std::cout<< tempR <<std::endl;
-            //若第i物件弧度值介於1.0至0.79之間，則可能為正方
+
             if (shape=="circle")
             {
-                if(tempR<1&&tempR>0.8)
+                if(tempR<ratio_cir_thr1 && tempR>ratio_cir_thr2)
                 {
-                    cv::Scalar color = cv::Scalar(0, 0, 255);
+                    cv::Scalar color = cv::Scalar(255, 255, 255);
                     cv::drawContours(dst, contours, i, color, 2, 8, hierarchy);
                 }
             }
             if (shape=="squre")
             {
-                if(tempR<0.8&&tempR>0.75)
+                if(tempR<ratio_rec_thr1 && tempR>ratio_rec_thr2)
                 {
-                    cv::Scalar color = cv::Scalar(0, 0, 255);
+                    cv::Scalar color = cv::Scalar(255, 255, 255);
                     cv::drawContours(dst, contours, i, color, 2, 8, hierarchy);
                 }
 
@@ -79,14 +79,16 @@ public:
 
             if (shape=="triangle")
             {
-                if(tempR<0.6)
+                if(tempR<ratio_tri_thr)
                 {
-                    cv::Scalar color = cv::Scalar(0, 0, 255);
+                    cv::Scalar color = cv::Scalar(255, 255, 255);
                     cv::drawContours(dst, contours, i, color, 2, 8, hierarchy);
                 }
 
             }
         }
+
+        cv::resize(dst, dst, cv::Size(400, 300));
         return dst;
     }
 
@@ -111,31 +113,35 @@ public:
             //畫輪廓
             drawContours(contoursImg, contours, i, color, 2, 8, hierarchy);
         }
-        return this->Mat2QImage(contoursImg);
+        return this->convertProcess(contoursImg);
     }
 
     QImage seekCircle(const cv::Mat &input)
     {
-       return  this->Mat2QImage(this->findBy(input,"circle"));
+       return  this->convertProcess(this->findBy(input,"circle"));
     }
 
     QImage seekTriangle(const cv::Mat &input)
     {
-       return  this->Mat2QImage(this->findBy(input,"triangle"));
+       return  this->convertProcess(this->findBy(input,"triangle"));
     }
 
     QImage seekSqure(const cv::Mat &input)
     {
 
-       return  this->Mat2QImage(this->findBy(input,"squre"));
+       return  this->convertProcess(this->findBy(input,"squre"));
     }
 
-    QImage Mat2QImage(cv::Mat const& src)
-    {
-         cv::Mat temp(src.cols,src.rows,src.type());
-         cvtColor(src, temp,CV_BGR2RGB);
-         QImage dest= QImage((uchar*) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
-         return dest;
+    QImage convertProcess(cv::Mat img){
+        if(img.type() == CV_8UC1){
+            return QImage((unsigned char*)img.data, img.cols, img.rows, img.step, QImage::Format_Indexed8).copy();
+        }
+        else{
+            cv::Mat dst;
+            img.copyTo(dst);
+            cv::cvtColor(dst, dst, CV_BGR2RGB);
+            return QImage((unsigned char*)dst.data, dst.cols, dst.rows, dst.step, QImage::Format_RGB888).copy();
+        }
     }
 
 

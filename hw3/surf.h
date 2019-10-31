@@ -14,10 +14,9 @@ class Surf{
 public:
     Surf(cv::Mat obj): _obj(obj){}
 
-//    cv::Mat doImage(cv::Mat tar){
     QImage doImage(cv::Mat tar){
         cv::Mat dst = tar.clone();
-        int minHessian = 450;
+        int minHessian = 425;
         double max_dist, min_dist;
         cv::SurfFeatureDetector detector( minHessian );
         std::vector<cv::KeyPoint> keypoints_1, keypoints_2;
