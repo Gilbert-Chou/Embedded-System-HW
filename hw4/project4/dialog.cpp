@@ -1,7 +1,7 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 #include "VideoCapture.h"
-
+#include <QFileInfo>
 
 
 
@@ -20,24 +20,31 @@ Dialog::~Dialog()
 
 void Dialog::on_Capture_clicked()
 {
+    VideoCapture *v=new VideoCapture();
     if(isStart==false){
         ui->Capture->setText("save");
-        VideoCapture *v=new VideoCapture();
-        cv::Mat tem;
         isStart=true;
-        pi=true;
         myShowImage = convertProcess(temimage);
         ui->label_2->setPixmap(QPixmap::fromImage(myShowImage).scaled(this->ui->label_2->size()));
-
+        pi=false;
     }
     else{
         isStart=false;
-        pi=false;
         ui->Capture->setText("Capture");
-        myShowImage=myShowImage.scaledToHeight(150);
-        myShowImage=myShowImage.scaledToWidth(100);
-        myShowImage.save("/home/ubuntu/project4/test.jpg");
-
+        myShowImage = myShowImage.scaled(200,150 ,Qt::KeepAspectRatio);
+        int num=100;
+        QString str ;
+        while(true){
+            str = QString::number(num);
+            QFileInfo file("/home/ubuntu/project4/dataset/"+str+".jpg");
+            if(file.exists()==true)
+            {
+                    num+=1;
+            }
+            else
+                break;
+        }
+        myShowImage.save("/home/ubuntu/project4/dataset/"+str+".jpg");
     }
 }
 

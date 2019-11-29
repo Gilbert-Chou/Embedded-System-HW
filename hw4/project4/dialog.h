@@ -28,7 +28,7 @@ private:
     QImage facedetect;
     QImage convertProcess(cv::Mat image);
     bool isStart =false;
-    bool pi=true;
+    bool pi=false;
     cv::Mat temimage;
 
 };

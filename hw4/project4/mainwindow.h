@@ -18,6 +18,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     QImage convertProcess(cv::Mat image);
+    int trainModel();
+    cv::Mat QImage2cvMat(QImage image);
 private slots:
     void on_CloseApp_clicked();
 
