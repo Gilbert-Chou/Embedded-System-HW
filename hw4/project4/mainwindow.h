@@ -20,6 +20,7 @@ public:
     QImage convertProcess(cv::Mat image);
     int trainModel();
     cv::Mat QImage2cvMat(QImage image);
+    void removeListSame(QStringList *list);
 private slots:
     void on_CloseApp_clicked();
 

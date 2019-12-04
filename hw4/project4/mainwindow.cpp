@@ -9,11 +9,14 @@
 #include "Thread.h"
 #include <QPixmap>
 #include "dialog.h"
-
+#include <QFileDialog>
+#include "iostream"
+#include <QDir>
 
 Thread *thread1=new Thread();
 cv::Mat ttttt;
-
+QStringList labellist;
+int sss=0;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -97,18 +100,87 @@ int MainWindow::trainModel(){
         std::vector<cv::Mat> images;
         std::vector<int> labels;
         // images for first person
-        images.push_back(cv::imread("/home/ubuntu/project4/dataset/1.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+        images.push_back(cv::imread("/home/ubuntu/project4/trainset/1.jpg", CV_LOAD_IMAGE_GRAYSCALE));
         labels.push_back(0);
-        images.push_back(cv::imread("/home/ubuntu/project4/dataset/2.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+        images.push_back(cv::imread("/home/ubuntu/project4/trainset/2.jpg", CV_LOAD_IMAGE_GRAYSCALE));
         labels.push_back(0);
-        images.push_back(cv::imread("/home/ubuntu/project4/dataset/3.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+        images.push_back(cv::imread("/home/ubuntu/project4/trainset/3.jpg", CV_LOAD_IMAGE_GRAYSCALE));
         labels.push_back(0);
+//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/0_0.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+//        labels.push_back(0);
+//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/0_1.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+//        labels.push_back(0);
 
         // images for second person
-        images.push_back(cv::imread("/home/ubuntu/project4/dataset/5.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-        labels.push_back(1);
-        images.push_back(cv::imread("/home/ubuntu/project4/dataset/4.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-        labels.push_back(1);
+//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/1_0.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+//        labels.push_back(1);
+//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/1_1.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+//        labels.push_back(1);
+
+        images.push_back(cv::imread("/home/ubuntu/project4/trainset/4.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+        labels.push_back(2);
+        images.push_back(cv::imread("/home/ubuntu/project4/trainset/5.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+        labels.push_back(2);
+//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/2_0.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+//        labels.push_back(2);
+//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/2_1.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+//        labels.push_back(2);
+//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/2_2.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+//        labels.push_back(2);
+//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/2_3.jpg", CV_LOAD_IMAGE_GRAYSCALE));
+//        labels.push_back(2);
+
+
+
+        QDir dir_origin("/home/ubuntu/project4/trainset/");
+        dir_origin.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+        dir_origin.setSorting(QDir::Size | QDir::Reversed);
+        QFileInfoList list_origin = dir_origin.entryInfoList();
+        for (int i = 0; i < list_origin.size(); i++) {
+            QFileInfo fileInfo = list_origin.at(i);
+            QString label=fileInfo.fileName().split("_").at(0);
+            std::string filename=fileInfo.fileName().toUtf8().constData();
+            images.push_back(cv::imread("/home/ubuntu/project4/trainset/"+filename, CV_LOAD_IMAGE_GRAYSCALE));
+            labels.push_back(label.toInt());
+        }
+
+
+
+
+
+        QDir dir("/home/ubuntu/project4/dataset/");
+        dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+        dir.setSorting(QDir::Size | QDir::Reversed);
+        QFileInfoList list = dir.entryInfoList();
+
+        bool throwit=true;
+        for (int i = 0; i < list.size(); i++) {
+            QFileInfo fileInfo = list.at(i);
+            QString label=fileInfo.fileName().split("_").at(0);
+            throwit=true;
+            for(int j=0;j<labellist.size();j++){
+                if(labellist.at(j)==label){
+                    throwit=false;
+                }
+            }
+            if(throwit==true)
+                labellist.append(label);
+        }
+        for (int i = 0; i < list.size(); i++) {
+            QFileInfo fileInfo = list.at(i);
+            QString label=fileInfo.fileName().split("_").at(0);
+            std::string filename=fileInfo.fileName().toUtf8().constData();
+
+            for(int j=0;j<labellist.size();j++){
+                if(labellist.at(j)==label){
+                    images.push_back(cv::imread("/home/ubuntu/project4/dataset/"+filename, CV_LOAD_IMAGE_GRAYSCALE));
+                    labels.push_back(j+3);
+                }
+            }
+        }
+
+
+
         cv::Ptr<cv::FaceRecognizer> model = cv::createFisherFaceRecognizer();
         //訓練
         model->train(images, labels);
@@ -132,13 +204,23 @@ void MainWindow::on_Face_clicked()
     predict=trainModel();
     QString str = QString::number(predict);
     ui->peopletext->setText(str);
+
     if (predict==0){
        ui->nametext->setText("107598012");
     }
     else if (predict==1){
        ui->nametext->setText("107598042");
     }
-
+    else if (predict==2){
+        ui->nametext->setText("-1");
+    }
+    else if (predict>=3){
+        ui->nametext->setText(labellist.at(predict-3));
+    }
+    std::cout<<predict;
+    sss+=1;
+    ui->facetext->setText(QString::number(sss));
+    cv::waitKey(1000); //delay
 
 
 }
@@ -152,3 +234,17 @@ void MainWindow::on_Addface_clicked()
    D.exec();
 }
 
+void MainWindow::removeListSame(QStringList *list)
+{
+    for (int i = 0; i < list->count(); i++)
+    {
+        for (int k = i + 1; k <  list->count(); k++)
+        {
+            if ( list->at(i) ==  list->at(k))
+            {
+                list->removeAt(k);
+                k--;
+            }
+        }
+    }
+}

@@ -32,11 +32,12 @@ void Dialog::on_Capture_clicked()
         isStart=false;
         ui->Capture->setText("Capture");
         myShowImage = myShowImage.scaled(200,150 ,Qt::KeepAspectRatio);
-        int num=100;
+        int num=0;
+        QString text = ui->textEdit->toPlainText();
         QString str ;
         while(true){
             str = QString::number(num);
-            QFileInfo file("/home/ubuntu/project4/dataset/"+str+".jpg");
+            QFileInfo file("/home/ubuntu/project4/dataset/"+ text+"_"+str+".jpg");
             if(file.exists()==true)
             {
                     num+=1;
@@ -44,7 +45,7 @@ void Dialog::on_Capture_clicked()
             else
                 break;
         }
-        myShowImage.save("/home/ubuntu/project4/dataset/"+str+".jpg");
+        myShowImage.save("/home/ubuntu/project4/dataset/"+ text+"_"+str+".jpg");
     }
 }
 
