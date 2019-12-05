@@ -19,6 +19,8 @@ public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
     void add(cv::Mat img);
+    cv::Mat QImage2cvMat(QImage image);
+    QString name();
 private slots:
     void on_Capture_clicked();
 
@@ -30,7 +32,7 @@ private:
     bool isStart =false;
     bool pi=false;
     cv::Mat temimage;
-
+    QString filename;
 };
 
 #endif // DIALOG_H

@@ -4,7 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/features2d.hpp"
+
 
 #include "Thread.h"
 #include <QPixmap>
@@ -16,7 +16,7 @@
 Thread *thread1=new Thread();
 cv::Mat ttttt;
 QStringList labellist;
-int sss=0;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -96,40 +96,9 @@ cv::Mat MainWindow::QImage2cvMat(QImage image)
 
 
 int MainWindow::trainModel(){
-//    圖片要200*150
+//    圖片要50*50
         std::vector<cv::Mat> images;
         std::vector<int> labels;
-        // images for first person
-        images.push_back(cv::imread("/home/ubuntu/project4/trainset/1.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-        labels.push_back(0);
-        images.push_back(cv::imread("/home/ubuntu/project4/trainset/2.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-        labels.push_back(0);
-        images.push_back(cv::imread("/home/ubuntu/project4/trainset/3.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-        labels.push_back(0);
-//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/0_0.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-//        labels.push_back(0);
-//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/0_1.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-//        labels.push_back(0);
-
-        // images for second person
-//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/1_0.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-//        labels.push_back(1);
-//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/1_1.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-//        labels.push_back(1);
-
-        images.push_back(cv::imread("/home/ubuntu/project4/trainset/4.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-        labels.push_back(2);
-        images.push_back(cv::imread("/home/ubuntu/project4/trainset/5.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-        labels.push_back(2);
-//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/2_0.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-//        labels.push_back(2);
-//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/2_1.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-//        labels.push_back(2);
-//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/2_2.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-//        labels.push_back(2);
-//        images.push_back(cv::imread("/home/ubuntu/project4/trainset/2_3.jpg", CV_LOAD_IMAGE_GRAYSCALE));
-//        labels.push_back(2);
-
 
 
         QDir dir_origin("/home/ubuntu/project4/trainset/");
@@ -185,6 +154,7 @@ int MainWindow::trainModel(){
         //訓練
         model->train(images, labels);
         cv::Mat img = cv::imread("/home/ubuntu/project4/test.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+        cv::resize(img, img, cv::Size(50, 50));
         //測試
         int predicted = model->predict(img);
         return predicted;
@@ -194,10 +164,14 @@ int MainWindow::trainModel(){
 void MainWindow::on_Face_clicked()
 {
     facedetect=myShowImage;
-    ui->Detect->setPixmap(QPixmap::fromImage(facedetect).scaled(400,300,Qt::KeepAspectRatio));
     facedetect = facedetect.scaled(200,150 ,Qt::KeepAspectRatio);
     facedetect.save("/home/ubuntu/project4/test.jpg");
+    cv::Mat img2 = cv::imread("/home/ubuntu/project4/test.jpg", CV_LOAD_IMAGE_ANYCOLOR);
+    VideoCapture *v=new VideoCapture();
+    facedetect = convertProcess(v->facedetectdrow(img2,false,"0"));
 
+    ui->facetext->setText("Number of faces: "+QString::number(v->getfacesize()));
+    ui->Detect->setPixmap(QPixmap::fromImage(facedetect).scaled(400,300,Qt::KeepAspectRatio));
 //    cv::Mat ee;
 //    ee=QImage2cvMat(facedetect);
     int predict;
@@ -209,7 +183,7 @@ void MainWindow::on_Face_clicked()
        ui->nametext->setText("107598012");
     }
     else if (predict==1){
-       ui->nametext->setText("107598042");
+       ui->nametext->setText("107598002");
     }
     else if (predict==2){
         ui->nametext->setText("-1");
@@ -218,8 +192,6 @@ void MainWindow::on_Face_clicked()
         ui->nametext->setText(labellist.at(predict-3));
     }
     std::cout<<predict;
-    sss+=1;
-    ui->facetext->setText(QString::number(sss));
     cv::waitKey(1000); //delay
 
 
@@ -232,6 +204,9 @@ void MainWindow::on_Addface_clicked()
    D.add(ttttt);
    D.setModal(true);
    D.exec();
+
+   VideoCapture *v=new VideoCapture();
+   v->facedetectdrow(ttttt,true,D.name());
 }
 
 void MainWindow::removeListSame(QStringList *list)
@@ -248,3 +223,5 @@ void MainWindow::removeListSame(QStringList *list)
         }
     }
 }
+
+
