@@ -169,16 +169,16 @@ void MainWindow::on_Face_clicked()
     cv::Mat img2 = cv::imread("/home/ubuntu/project4/test.jpg", CV_LOAD_IMAGE_ANYCOLOR);
     VideoCapture *v=new VideoCapture();
     facedetect = convertProcess(v->facedetectdrow(img2,false,"0"));
-
+    img2=peopleDetecte(QImage2cvMat(facedetect));
+    facedetect = convertProcess(img2);
     ui->facetext->setText("Number of faces: "+QString::number(v->getfacesize()));
     ui->Detect->setPixmap(QPixmap::fromImage(facedetect).scaled(400,300,Qt::KeepAspectRatio));
 //    cv::Mat ee;
 //    ee=QImage2cvMat(facedetect);
     int predict;
     predict=trainModel();
-    QString str = QString::number(predict);
-    ui->peopletext->setText(str);
-
+    QString str = QString::number(numberofpeople);
+    ui->peopletext->setText("number of people: "+str);
     if (predict==0){
        ui->nametext->setText("107598012");
     }
@@ -190,6 +190,10 @@ void MainWindow::on_Face_clicked()
     }
     else if (predict>=3){
         ui->nametext->setText(labellist.at(predict-3));
+    }
+    if(v->getfacesize()==0)
+    {
+        ui->nametext->setText("-1");
     }
     std::cout<<predict;
     cv::waitKey(1000); //delay
@@ -224,4 +228,46 @@ void MainWindow::removeListSame(QStringList *list)
     }
 }
 
+
+cv::Mat MainWindow::peopleDetecte(cv::Mat img){
+    numberofpeople=0;
+    std::vector <cv::Rect> found, found_filtered;
+       cv::HOGDescriptor people_dectect_hog;
+           // 採用默認的已經訓練好了的svm係數作為此次檢測的模型
+       people_dectect_hog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
+            // 對輸入的圖片img進行多尺度行人檢測
+            // img為輸入待檢測的圖片；found為檢測到目標區域列表；參數3為程序內部計算為行人目標的閾值，也就是檢測到的特徵到SVM分類超平面的距離;
+            // 參數4為滑動窗口每次移動的距離。它必須是塊移動的整數倍；參數5為圖像擴充的大小；參數6為比例係數，即測試圖片每次尺寸縮放增加的比例；
+            // 參數7為組閾值，即校正係數，當一個目標被多個窗口檢測出來時，該參數此時就起了調節作用，為0時表示不起調節作用。
+       people_dectect_hog.detectMultiScale(img, found, 0 , cv::Size( 8 , 8 ), cv::Size( 32 , 32 ), 1.05 , 2 );
+
+           size_t i, j;
+
+           for (int i=0;i<found.size();i++)
+           {
+               cv::Rect r=found[i];
+               // 下面的這個for語句是找出所有沒有嵌套的矩形框r,並放入found_filtered中,如果有嵌套的
+               // 話,則取外面最大的那個矩形框放入found_filtered中
+               for (j = 0 ; j <found.size(); j++ )
+                    if (j != i && (r&found[j])== r)
+                        break ;
+                if (j == found.size())
+                  found_filtered.push_back(r);
+           }
+
+           // 在圖片img上畫出矩形框,因為hog檢測出的矩形框比實際人體框要稍微大些,所以這裡需要
+            // 做一些調整
+            numberofpeople=found_filtered.size();
+           for (i = 0 ; i <found_filtered.size(); i++ )
+               {
+                   cv::Rect r = found_filtered[i];
+                   r.x += cvRound(r.width* 0.1 );
+                   r.width = cvRound(r.width* 0.8 );
+                   r.y += cvRound(r.height* 0.07 );
+                   r.height = cvRound(r.height* 0.8 );
+                   rectangle(img, r.tl(), r.br(), cv::Scalar( 0 , 255 , 0 ), 3 );
+               }
+           return img;
+
+}
 

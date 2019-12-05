@@ -21,6 +21,7 @@ public:
     int trainModel();
     cv::Mat QImage2cvMat(QImage image);
     void removeListSame(QStringList *list);
+    cv::Mat peopleDetecte(cv::Mat img);
 private slots:
     void on_CloseApp_clicked();
 
@@ -36,6 +37,7 @@ private:
     bool isStart = false;
     bool flag=true;
     bool pi=true;
+    int numberofpeople=0;
 };
 
 #endif // MAINWINDOW_H
